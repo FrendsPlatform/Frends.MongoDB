@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace Frends.MongoDB.Update.Definitions;
 
@@ -35,11 +36,11 @@ public class Input
     [UIHint(nameof(InputType), "", InputType.Filter)]
     public string Filter { get; set; }
 
-    /// <summary>
-    /// An array of filter(s) to be processed one by one.
-    /// </summary>
-    /// <example>{{'foo':'bar'}, {'bar':'foo'}}</example>
-    [UIHint(nameof(InputType), "", InputType.Filters)]
+	/// <summary>
+	/// An array of filter(s) to be processed one by one.
+	/// </summary>
+	/// <example>{{'foo':'bar'}, {'bar':'foo'}}</example>
+	[UIHint(nameof(InputType), "", InputType.Filters)]
     public DocumentValues[] Filters { get; set; }
 
     /// <summary>
@@ -48,6 +49,19 @@ public class Input
     /// <example>c:\temp\file.json</example>
     [UIHint(nameof(InputType), "", InputType.File)]
     public string File { get; set; }
+
+	/// <summary>
+	/// Specifies the array filter for an update operation.
+	/// In the example below this UpdateString is used: {$set: {'children.$[i].value': 'new_value'}} 
+	/// </summary>
+	/// <example>{'i.child': 1, 'i.value': 'val1'}</example>
+	public string ArrayFilter { get; set; }
+
+	/// <summary>
+	/// Specifies whether the update operation performs an
+	/// upsert operation if no documents match the query filter.
+	/// </summary>
+	public bool Upsert { get; set; } = false;
 }
 
 /// <summary>

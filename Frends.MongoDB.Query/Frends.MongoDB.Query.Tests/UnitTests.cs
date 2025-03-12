@@ -1,30 +1,34 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Frends.MongoDB.Query.Definitions;
-using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Bson.IO;
+using MongoDB.Bson;
 
 namespace Frends.MongoDB.Query.Tests;
 
 [TestClass]
 public class UnitTests
 {
-    /* 
+	/* 
         Run command 'docker-compose up -d' in \Frends.MongoDB.Query.Tests\Files\
     */
 
-    private static readonly Connection _connection = new()
-    {
-        ConnectionString = "mongodb://admin:Salakala@localhost:27017/?authSource=admin",
-        Database = "testdb",
-        CollectionName = "testcoll",
-    };
+	private static readonly Connection _connection = new()
+	{
+		ConnectionString = "mongodb://admin:Salakala@localhost:27017/?authSource=admin",
+		Database = "testdb",
+		CollectionName = "testcoll",
+	};
 
-    private readonly string _doc1 = "{ \"foo\":\"bar\", \"bar\": \"foo\" }";
-    private readonly string _doc2 = "{ \"foo\":\"bar\", \"bar\": \"foo\" }";
-    private readonly string _doc3 = "{ \"qwe\":\"rty\", \"asd\": \"fgh\" }";
+	private readonly List<string> _documents = new()
+	{
+		"{ 'foo':'bar', 'bar': 'foo' }",
+		"{ 'foo':'bar', 'bar': 'foo' }",
+		"{ 'foo':99, 'bar': 'foo' }",
+		"{ 'qwe':'rty', 'asd': 'fgh' }"
+	};
 
-
-    [TestInitialize]
+	[TestInitialize]
     public void StartUp()
     {
         InsertTestData();
@@ -33,16 +37,17 @@ public class UnitTests
     [TestCleanup]
     public void CleanUp()
     {
-        DeleteTestData();
-    }
+		DeleteTestData();
+	}
 
     [TestMethod]
     public void Test_Query_TwoResults()
     {
         var _input = new Input()
         {
-            Filter = "{'foo':'bar'}"
-        };
+            Filter = "{'foo':'bar'}",
+			QueryOptions = QueryOptions.QueryMany
+		};
 
         var result = MongoDB.Query(_input, _connection, default);
         Assert.IsTrue(result.Success);
@@ -55,14 +60,44 @@ public class UnitTests
         var _input = new Input()
         {
             Filter = "{'qwe':'rty'}"
-        };
+		};
 
         var result = MongoDB.Query(_input, _connection, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.Data.Count);
     }
 
-    [TestMethod]
+	[TestMethod]
+	public void Test_Query_RelaxedExtendedJson()
+	{
+		var _input = new Input()
+		{
+			Filter = "{'foo':99}",
+			JsonOutputMode = Definitions.JsonOutputMode.RelaxedExtendedJson,
+		};
+
+		var result = MongoDB.Query(_input, _connection, default);
+		Assert.IsTrue(result.Success);
+		Assert.AreEqual(1, result.Data.Count);
+		Assert.IsFalse(result.Data[0].Contains("$numberInt"));
+	}
+
+	[TestMethod]
+	public void Test_Query_CanonicalExtendedJson()
+	{
+		var _input = new Input()
+		{
+			Filter = "{'foo':99}",
+			JsonOutputMode = Definitions.JsonOutputMode.CanonicalExtendedJson,
+		};
+
+		var result = MongoDB.Query(_input, _connection, default);
+		Assert.IsTrue(result.Success);
+		Assert.AreEqual(1, result.Data.Count);
+		Assert.IsTrue(result.Data[0].Contains("$numberInt"));
+	}
+
+	[TestMethod]
     public void Test_Query_NotFoundFilter()
     {
         var _input = new Input()
@@ -78,7 +113,7 @@ public class UnitTests
     [TestMethod]
     public void Test_EmptyQuery()
     {
-        var ex = Assert.ThrowsException<Exception>(() => MongoDB.Query(new Input { Filter = "" }, _connection, default));
+        var ex = Assert.ThrowsException<ArgumentException>(() => MongoDB.Query(new Input { Filter = "" }, _connection, default));
         Assert.AreEqual("Query error: Filter can't be null.", ex.Message);
     }
 
@@ -101,28 +136,44 @@ public class UnitTests
         Assert.IsTrue(ex.Message.StartsWith("Query error: MongoDB.Driver.MongoAuthenticationException: Unable to authenticate using sasl protocol mechanism SCRAM-SHA-1."));
     }
 
-    private void InsertTestData()
-    {
-        try
-        {
-            var collection = GetMongoCollection(_connection.ConnectionString, _connection.Database, _connection.CollectionName);
+	private void InsertTestData()
+	{
+		try
+		{
+			var collection = GetMongoCollection(_connection.ConnectionString, _connection.Database, _connection.CollectionName);
 
-            var doc1 = BsonDocument.Parse(_doc1);
-            var doc2 = BsonDocument.Parse(_doc2);
-            var doc3 = BsonDocument.Parse(_doc3);
+			foreach (var doc in _documents)
+			{
+				collection.InsertOne(BsonDocument.Parse(doc));
+			}
+		}
+		catch (Exception ex)
+		{
+			throw new Exception(ex.Message);
+		}
+	}
 
-            collection.InsertOne(doc1);
-            collection.InsertOne(doc2);
-            collection.InsertOne(doc3);
-        }
-        catch (Exception ex)
-        {
+	private static void DeleteTestData()
+	{
+		var collection = GetMongoCollection(_connection.ConnectionString, _connection.Database, _connection.CollectionName);
 
-            throw new Exception(ex.Message);
-        }
-    }
+		List<string> filters = new()
+		{
+			"{'bar':'foo'}",
+			"{'qwe':'rty'}",
+			"{'asd':'fgh'}",
+			"{foo:'update'}",
+			"{'foobar':'upsert_create'}",
+			"{'array':'arr'}"
+		};
 
-    private static IMongoCollection<BsonDocument> GetMongoCollection(string connectionString, string database, string collectionName)
+		foreach (var filter in filters)
+		{
+			collection.DeleteMany(filter);
+		}
+	}
+
+	private static IMongoCollection<BsonDocument> GetMongoCollection(string connectionString, string database, string collectionName)
     {
         var dataBase = GetMongoDatabase(connectionString, database);
         var collection = dataBase.GetCollection<BsonDocument>(collectionName);
@@ -134,17 +185,5 @@ public class UnitTests
         var mongoClient = new MongoClient(connectionString);
         var dataBase = mongoClient.GetDatabase(database);
         return dataBase;
-    }
-
-    private static void DeleteTestData()
-    {
-        var collection = GetMongoCollection(_connection.ConnectionString, _connection.Database, _connection.CollectionName);
-
-        var filter1 = "{'bar':'foo'}";
-        var filter2 = "{'qwe':'rty'}";
-        var filter3 = "{'asd':'fgh'}";
-        collection.DeleteMany(filter1);
-        collection.DeleteMany(filter2);
-        collection.DeleteMany(filter3);
     }
 }

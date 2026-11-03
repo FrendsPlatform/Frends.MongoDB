@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.1.1] - 2026-11-03
+## [1.1.0] - 2026-11-03
 ### Added
 - Added options for controlling how update failures are handled and returning structured error details.
 ### Changed

@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.1.1] - 2026-11-03
+## [1.1.0] - 2026-11-03
 ### Added
 - Added configurable error handling for delete failures and support for .NET 8.
 

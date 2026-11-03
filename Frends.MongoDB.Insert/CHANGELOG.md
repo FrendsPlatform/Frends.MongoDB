@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.1.1] - 2026-11-03
+## [1.1.0] - 2026-11-03
 ### Changed
 - Added options to control task failure handling and provide error details.
 - Updated compression dependencies to address known security vulnerabilities.

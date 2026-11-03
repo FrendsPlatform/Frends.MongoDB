@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -33,7 +33,10 @@ public static class MongoDB
     {
         try
         {
-            var collection = GetMongoCollection(connection.ConnectionString, connection.Database, connection.CollectionName);
+            var collection = GetMongoCollection(
+                connection.ConnectionString,
+                connection.Database,
+                connection.CollectionName);
             var ids = new List<string>();
 
             switch (input.InputType)
@@ -71,7 +74,10 @@ public static class MongoDB
         }
     }
 
-    private static IMongoCollection<BsonDocument> GetMongoCollection(string connectionString, string database, string collectionName)
+    private static IMongoCollection<BsonDocument> GetMongoCollection(
+        string connectionString,
+        string database,
+        string collectionName)
     {
         var dataBase = GetMongoDatabase(connectionString, database);
         var collection = dataBase.GetCollection<BsonDocument>(collectionName);

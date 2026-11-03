@@ -49,7 +49,7 @@ public class UnitTests
             UpdateString = "{$set: {foo:'update'}}"
         };
 
-        var result = await MongoDB.Update(_input, _connection, default);
+        var result = await MongoDB.Update(_input, _connection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(0, result.Count);
         Assert.IsFalse(GetDocuments("update"));
@@ -68,7 +68,7 @@ public class UnitTests
             UpdateString = "{$set: {foo:'update'}}"
         };
 
-        var result = await MongoDB.Update(_input, _connection, default);
+        var result = await MongoDB.Update(_input, _connection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.Count);
         Assert.IsTrue(GetDocuments("update"));
@@ -87,7 +87,7 @@ public class UnitTests
             UpdateString = "{$set: {foo:'update'}}"
         };
 
-        var result = await MongoDB.Update(_input, _connection, default);
+        var result = await MongoDB.Update(_input, _connection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(2, result.Count);
         Assert.IsTrue(GetDocuments("update"));
@@ -109,7 +109,7 @@ public class UnitTests
             UpdateString = "{$set: {foo:'update'}}"
         };
 
-        var result = await MongoDB.Update(_input, _connection, default);
+        var result = await MongoDB.Update(_input, _connection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(2, result.Count);
         Assert.IsTrue(GetDocuments("update"));
@@ -131,7 +131,7 @@ public class UnitTests
             UpdateString = "{$set: {foo:'update'}}"
         };
 
-        var result = await MongoDB.Update(_input, _connection, default);
+        var result = await MongoDB.Update(_input, _connection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(3, result.Count);
         Assert.IsTrue(GetDocuments("update"));
@@ -150,7 +150,7 @@ public class UnitTests
             UpdateString = "{$set: {foo:'update'}}"
         };
 
-        var result = await MongoDB.Update(_input, _connection, default);
+        var result = await MongoDB.Update(_input, _connection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.Count);
         Assert.IsTrue(GetDocuments("update"));
@@ -169,14 +169,30 @@ public class UnitTests
             UpdateString = "{$set: {foo:'update'}}"
         };
 
-        var result = await MongoDB.Update(_input, _connection, default);
+        var result = await MongoDB.Update(_input, _connection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(2, result.Count);
         Assert.IsTrue(GetDocuments("update"));
     }
 
     [TestMethod]
-    public void Test_InvalidConnectionString()
+    public async Task Test_Update_ReturnsErrorWhenThrowingIsDisabled()
+    {
+        var input = new Input();
+        var options = new Options
+        {
+            ThrowErrorOnFailure = false,
+        };
+
+        var result = await MongoDB.Update(input, _connection, options, default);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual("Update string missing.", result.Error.Message);
+        Assert.IsNotNull(result.Error.AdditionalInfo);
+    }
+
+    [TestMethod]
+    public async Task Test_InvalidConnectionString()
     {
         var _input = new Input()
         {
@@ -195,8 +211,9 @@ public class UnitTests
             Database = _connection.Database,
         };
 
-        var ex = Assert.ThrowsExceptionAsync<Exception>(async () => await MongoDB.Update(_input, connection, default));
-        Assert.IsTrue(ex.Result.Message.StartsWith("Update error: System.Exception: UpdateOperation error: MongoDB.Driver.MongoAuthenticationException: Unable to authenticate using sasl protocol mechanism SCRAM-SHA-1."));
+        var ex = await Assert.ThrowsExceptionAsync<MongoAuthenticationException>(
+            async () => await MongoDB.Update(_input, connection, new Options(), default));
+        Assert.IsTrue(ex.Message.StartsWith("Unable to authenticate using sasl protocol mechanism SCRAM-SHA-1."));
     }
 
     private void InsertTestData()

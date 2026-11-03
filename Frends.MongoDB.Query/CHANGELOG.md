@@ -1,9 +1,10 @@
 # Changelog
 
-## [1.1.1] - 2026-11-03
+## [2.0.0] - 2026-11-03
 ### Fixed
 - Added task options for controlling how query failures are returned or thrown.
 - Upgraded the Query task and its test project to .NET 8.
+- **[Breaking change]** Task now re-throws original exception instead of creating a new exception with a custom message.
 
 ## [1.0.1] - 2023-11-23
 ### Fixed

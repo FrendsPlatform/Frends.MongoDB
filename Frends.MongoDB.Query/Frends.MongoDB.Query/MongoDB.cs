@@ -58,12 +58,7 @@ public static class MongoDB
         }
         catch (Exception ex)
         {
-            if (ex is OperationCanceledException)
-            {
-                return ex.Handle(options);
-            }
-
-            return new Exception($"Query error: {ex}").Handle(options);
+            return ex.Handle(options);
         }
     }
 

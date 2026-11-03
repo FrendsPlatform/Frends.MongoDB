@@ -110,11 +110,11 @@ public class UnitTests
             Database = connection.Database,
         };
 
-        var ex = Assert.ThrowsException<Exception>(
+        var ex = Assert.ThrowsException<MongoAuthenticationException>(
             () => MongoDB.Query(input, invalidConnection, new Options(), default));
         Assert.IsTrue(
             ex.Message.StartsWith(
-                "Query error: MongoDB.Driver.MongoAuthenticationException: Unable to authenticate using sasl protocol mechanism SCRAM-SHA-1."));
+                "Unable to authenticate using sasl protocol mechanism SCRAM-SHA-1."));
     }
 
     private void InsertTestData()

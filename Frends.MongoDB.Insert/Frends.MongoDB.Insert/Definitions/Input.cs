@@ -39,15 +39,3 @@ public class Input
     [UIHint(nameof(InputType), "", InputType.File)]
     public string File { get; set; }
 }
-
-/// <summary>
-/// Input.Documents values.
-/// </summary>
-public class DocumentValues
-{
-    /// <summary>
-    /// Value.
-    /// </summary>
-    /// <example>{"foo": "bar", "bar": "foo"}</example>
-    public string Value { get; set; }
-}

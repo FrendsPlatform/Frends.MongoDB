@@ -18,5 +18,5 @@ public enum InputType
     /// <summary>
     /// JSON string(s) to be processed.
     /// </summary>
-    Documents
+    Documents,
 }

@@ -7,6 +7,13 @@ namespace Frends.MongoDB.Insert.Definitions;
 /// </summary>
 public class Result
 {
+    internal Result(bool success, List<string> id, Error error = null)
+    {
+        Success = success;
+        Id = id;
+        Error = error;
+    }
+
     /// <summary>
     /// Document(s) added.
     /// </summary>
@@ -19,9 +26,9 @@ public class Result
     /// <example>6357ae6e8b77e824c8381113</example>
     public List<string> Id { get; private set; }
 
-    internal Result(bool success, List<string> id)
-    {
-        Success = success;
-        Id = id;
-    }
+    /// <summary>
+    /// Error that occurred during task execution.
+    /// </summary>
+    /// <example>MongoDB insert failed: document validation error</example>
+    public Error Error { get; private set; }
 }

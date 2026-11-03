@@ -1,4 +1,4 @@
-﻿namespace Frends.MongoDB.Update.Definitions;
+namespace Frends.MongoDB.Update.Definitions;
 
 /// <summary>
 /// Update options.
@@ -34,5 +34,5 @@ public enum InputType
     /// <summary>
     /// The file containing filter.
     /// </summary>
-    File
+    File,
 }

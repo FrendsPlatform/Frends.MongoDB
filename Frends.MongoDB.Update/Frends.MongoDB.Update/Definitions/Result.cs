@@ -1,4 +1,4 @@
-﻿namespace Frends.MongoDB.Update.Definitions;
+namespace Frends.MongoDB.Update.Definitions;
 
 /// <summary>
 /// Task result.

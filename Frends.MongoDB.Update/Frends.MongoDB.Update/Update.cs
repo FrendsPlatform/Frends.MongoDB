@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Threading;
@@ -68,11 +69,14 @@ public static class MongoDB
                 case InputType.Filters:
                     long count = 0;
                     foreach (var filterDocument in input.Filters)
+                    {
                         count += await UpdateOperation(
                             input,
                             BsonDocument.Parse(filterDocument.Value),
                             collection,
                             cancellationToken);
+                    }
+
                     return new Result
                     {
                         Success = true,

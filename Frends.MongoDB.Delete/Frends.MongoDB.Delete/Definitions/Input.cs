@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Frends.MongoDB.Delete.Definitions;
@@ -42,16 +42,4 @@ public class Input
     /// <example>c:\temp\file.json</example>
     [UIHint(nameof(InputType), "", InputType.File)]
     public string File { get; set; }
-}
-
-/// <summary>
-/// Input.Documents values.
-/// </summary>
-public class DocumentValues
-{
-    /// <summary>
-    /// Value.
-    /// </summary>
-    /// <example>{"foo": "bar", "bar": "foo"}</example>
-    public string Value { get; set; }
 }

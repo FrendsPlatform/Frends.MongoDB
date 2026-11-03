@@ -1,5 +1,5 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Frends.MongoDB.Delete.Definitions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -11,18 +11,16 @@ public class UnitTests
     /// <summary>
     /// Run command 'docker-compose up -d' in \Frends.MongoDB.Delete.Tests\Files\
     /// </summary>
-
-    private static readonly Connection _connection = new()
+    private static readonly Connection TestConnection = new()
     {
         ConnectionString = "mongodb://admin:Salakala@localhost:27017/?authSource=admin",
         Database = "testdb",
         CollectionName = "testcoll",
     };
 
-    private readonly string _doc1 = "{ \"foo\":\"bar\", \"bar\": \"foo\" }";
-    private readonly string _doc2 = "{ \"foo\":\"bar\", \"bar\": \"foo\" }";
-    private readonly string _doc3 = "{ \"qwe\":\"rty\", \"asd\": \"fgh\" }";
-
+    private static readonly string Doc1 = "{ \"foo\":\"bar\", \"bar\": \"foo\" }";
+    private static readonly string Doc2 = "{ \"foo\":\"bar\", \"bar\": \"foo\" }";
+    private static readonly string Doc3 = "{ \"qwe\":\"rty\", \"asd\": \"fgh\" }";
 
     [TestInitialize]
     public void StartUp()
@@ -39,7 +37,7 @@ public class UnitTests
     [TestMethod]
     public async Task Test_Delete_NotFound()
     {
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.Filter,
             DeleteOptions = Definitions.DeleteOptions.DeleteOne,
@@ -48,7 +46,7 @@ public class UnitTests
             File = null,
         };
 
-        var result = await MongoDB.Delete(_input, _connection, default);
+        var result = await MongoDB.Delete(input, TestConnection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(0, result.Count);
     }
@@ -56,7 +54,7 @@ public class UnitTests
     [TestMethod]
     public async Task Test_Delete_Single_DeleteOne()
     {
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.Filter,
             DeleteOptions = Definitions.DeleteOptions.DeleteOne,
@@ -65,7 +63,7 @@ public class UnitTests
             File = null,
         };
 
-        var result = await MongoDB.Delete(_input, _connection, default);
+        var result = await MongoDB.Delete(input, TestConnection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.Count);
     }
@@ -73,7 +71,7 @@ public class UnitTests
     [TestMethod]
     public async Task Test_Delete_Single_DeleteMany()
     {
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.Filter,
             DeleteOptions = Definitions.DeleteOptions.DeleteMany,
@@ -82,7 +80,7 @@ public class UnitTests
             File = null,
         };
 
-        var result = await MongoDB.Delete(_input, _connection, default);
+        var result = await MongoDB.Delete(input, TestConnection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(2, result.Count);
     }
@@ -93,7 +91,7 @@ public class UnitTests
         var doc1 = new DocumentValues() { Value = "{'foo':'bar'}" };
         var doc2 = new DocumentValues() { Value = "{'qwe':'rty'}" };
 
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.Filters,
             DeleteOptions = Definitions.DeleteOptions.DeleteOne,
@@ -102,7 +100,7 @@ public class UnitTests
             File = null,
         };
 
-        var result = await MongoDB.Delete(_input, _connection, default);
+        var result = await MongoDB.Delete(input, TestConnection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(2, result.Count);
     }
@@ -113,7 +111,7 @@ public class UnitTests
         var doc1 = new DocumentValues() { Value = "{'foo':'bar'}" };
         var doc2 = new DocumentValues() { Value = "{'qwe':'rty'}" };
 
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.Filters,
             DeleteOptions = Definitions.DeleteOptions.DeleteMany,
@@ -122,7 +120,7 @@ public class UnitTests
             File = null,
         };
 
-        var result = await MongoDB.Delete(_input, _connection, default);
+        var result = await MongoDB.Delete(input, TestConnection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(3, result.Count);
     }
@@ -130,7 +128,7 @@ public class UnitTests
     [TestMethod]
     public async Task Test_Delete_File_DeleteOne()
     {
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.File,
             DeleteOptions = Definitions.DeleteOptions.DeleteOne,
@@ -139,7 +137,7 @@ public class UnitTests
             File = "..//..//..//Files//testdata.json",
         };
 
-        var result = await MongoDB.Delete(_input, _connection, default);
+        var result = await MongoDB.Delete(input, TestConnection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.Count);
     }
@@ -147,7 +145,7 @@ public class UnitTests
     [TestMethod]
     public async Task Test_Delete_File_DeleteMany()
     {
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.File,
             DeleteOptions = Definitions.DeleteOptions.DeleteMany,
@@ -156,7 +154,7 @@ public class UnitTests
             File = "..//..//..//Files//testdata.json",
         };
 
-        var result = await MongoDB.Delete(_input, _connection, default);
+        var result = await MongoDB.Delete(input, TestConnection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(2, result.Count);
     }
@@ -164,7 +162,7 @@ public class UnitTests
     [TestMethod]
     public void Test_InvalidConnectionString()
     {
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.File,
             DeleteOptions = Definitions.DeleteOptions.DeleteMany,
@@ -176,36 +174,38 @@ public class UnitTests
         var connection = new Connection
         {
             ConnectionString = "mongodb://admin:Incorrect@localhost:27017/?authSource=invalid",
-            CollectionName = _connection.CollectionName,
-            Database = _connection.Database,
+            CollectionName = TestConnection.CollectionName,
+            Database = TestConnection.Database,
         };
 
-        var ex = Assert.ThrowsExceptionAsync<Exception>(async () => await MongoDB.Delete(_input, connection, default));
-        Assert.IsTrue(ex.Result.Message.StartsWith("Delete error: System.Exception: DeleteOperation error: MongoDB.Driver.MongoAuthenticationException: Unable to authenticate using sasl protocol mechanism SCRAM-SHA-1."));
+        var options = new Options { ErrorMessageOnFailure = "Delete error" };
+        var ex = Assert.ThrowsExceptionAsync<Exception>(async () => await MongoDB.Delete(input, connection, options, default));
+        Assert.AreEqual("Delete error", ex.Result.Message);
     }
 
-    private void InsertTestData()
+    private static void InsertTestData()
     {
         try
         {
-            var collection = GetMongoCollection(_connection.ConnectionString, _connection.Database, _connection.CollectionName);
+            var collection = GetMongoCollection(TestConnection.ConnectionString, TestConnection.Database, TestConnection.CollectionName);
 
-            var doc1 = BsonDocument.Parse(_doc1);
-            var doc2 = BsonDocument.Parse(_doc2);
-            var doc3 = BsonDocument.Parse(_doc3);
+            var document1 = BsonDocument.Parse(Doc1);
+            var document2 = BsonDocument.Parse(Doc2);
+            var document3 = BsonDocument.Parse(Doc3);
 
-            collection.InsertOne(doc1);
-            collection.InsertOne(doc2);
-            collection.InsertOne(doc3);
+            collection.InsertOne(document1);
+            collection.InsertOne(document2);
+            collection.InsertOne(document3);
         }
         catch (Exception ex)
         {
             throw new Exception(ex.Message);
         }
     }
+
     private static void DeleteTestData()
     {
-        var collection = GetMongoCollection(_connection.ConnectionString, _connection.Database, _connection.CollectionName);
+        var collection = GetMongoCollection(TestConnection.ConnectionString, TestConnection.Database, TestConnection.CollectionName);
 
         var filter1 = "{'bar':'foo'}";
         var filter2 = "{'qwe':'rty'}";

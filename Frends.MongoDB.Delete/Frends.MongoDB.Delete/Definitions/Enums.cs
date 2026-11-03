@@ -1,4 +1,4 @@
-﻿namespace Frends.MongoDB.Delete.Definitions;
+namespace Frends.MongoDB.Delete.Definitions;
 
 /// <summary>
 /// Delete options.
@@ -34,5 +34,5 @@ public enum InputType
     /// <summary>
     /// The file containing filter.
     /// </summary>
-    File
+    File,
 }

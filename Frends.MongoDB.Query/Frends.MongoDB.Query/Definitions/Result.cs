@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Frends.MongoDB.Query.Definitions;
 
 /// <summary>
@@ -14,9 +12,9 @@ public class Result
     public bool Success { get; set; }
 
     /// <summary>
-    /// Gets or sets the documents matching the query filter.
+    /// A list with the documents matching the search criteria .
     /// </summary>
-    /// <example>A matching document, for example {"foo":"bar","bar":"foo"}.</example>
+    /// <example>"Object{ \"_id\" : { \"$oid\" : \"635b6e17083070195c6e98f0\" }, \"foo\" : \"bar\", \"bar\" : \"foo\" }"</example>
     public List<string> Data { get; set; }
 
     /// <summary>

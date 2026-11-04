@@ -15,14 +15,14 @@ public class Connection
     public string ConnectionString { get; set; }
 
     /// <summary>
-    /// Gets or sets the database name.
+    /// Name of the database to connect to
     /// </summary>
-    /// <example>analytics, the database used for reporting.</example>
+    /// <example>analytics</example>
     public string Database { get; set; }
 
     /// <summary>
-    /// Gets or sets the collection name.
+    /// Name of the collection name.
     /// </summary>
-    /// <example>customers, the collection containing customer documents.</example>
+    /// <example>customers</example>
     public string CollectionName { get; set; }
 }

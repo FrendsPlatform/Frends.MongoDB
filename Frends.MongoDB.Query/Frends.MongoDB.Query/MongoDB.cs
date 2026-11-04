@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Threading;
 using Frends.MongoDB.Query.Definitions;
 using Frends.MongoDB.Query.Helpers;
 using MongoDB.Bson;
@@ -29,13 +27,13 @@ public static class MongoDB
         [PropertyTab] Options options,
         CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(input.Filter))
-        {
-            return new Exception("Query error: Filter can't be null.").Handle(options);
-        }
-
         try
         {
+            if (string.IsNullOrWhiteSpace(input.Filter))
+            {
+                throw new Exception("Query error: Filter can't be null.");
+            }
+
             var collection = GetMongoCollection(
                 connection.ConnectionString,
                 connection.Database,

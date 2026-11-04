@@ -11,7 +11,7 @@ public class Options
     /// <summary>
     /// Gets or sets a value indicating whether to throw an error when the query fails.
     /// </summary>
-    /// <example>true, so query failures are thrown as exceptions.</example>
+    /// <example>true</example>
     [DefaultValue(true)]
     public bool ThrowErrorOnFailure { get; set; } = true;
 

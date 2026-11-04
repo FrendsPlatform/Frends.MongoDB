@@ -6,8 +6,8 @@ namespace Frends.MongoDB.Query.Definitions;
 public class Input
 {
     /// <summary>
-    /// Gets or sets the filter document.
+    /// Filter document.
     /// </summary>
-    /// <example>Filter documents with an active status: {'status':'active'}.</example>
+    /// <example>{'foo':'bar'}</example>
     public string Filter { get; set; }
 }

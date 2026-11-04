@@ -1,8 +1,9 @@
 # Changelog
 
-## [1.1.0] - 2026-11-03
+## [2.0.0] - 2026-11-03
 ### Added
-- Added options for controlling how update failures are handled and returning structured error details.
+- Added an **Options** tab with `ThrowErrorOnFailure` and `ErrorMessageOnFailure` fields for configurable error handling.
+- **[Breaking change]** Task now re-throws original exception instead of creating a new exception
 ### Changed
 - Upgraded the task and test project to .NET 8.
 

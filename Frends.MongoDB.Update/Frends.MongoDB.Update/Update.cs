@@ -30,8 +30,6 @@ public static class MongoDB
         [PropertyTab] Options options,
         CancellationToken cancellationToken)
     {
-        options ??= new Options();
-
         try
         {
             if (string.IsNullOrWhiteSpace(input.UpdateString))

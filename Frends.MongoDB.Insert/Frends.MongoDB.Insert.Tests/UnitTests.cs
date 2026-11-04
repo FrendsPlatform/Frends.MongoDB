@@ -88,4 +88,39 @@ public class UnitTests
         Assert.IsNotNull(result.Error);
         Assert.IsNotNull(result.Error.AdditionalInfo);
     }
+
+    [TestMethod]
+    public async Task Test_Insert_Rethrows_Original_Exception_When_ThrowErrorOnFailure_Is_True()
+    {
+        var input = new Input
+        {
+            InputType = InputType.Document,
+            Document = "not json",
+        };
+        var testConnection = new Connection
+        {
+            ConnectionString = "mongodb://localhost:27017",
+            Database = "testdb",
+            CollectionName = "testcoll",
+        };
+        var options = new Options
+        {
+            ThrowErrorOnFailure = true,
+            ErrorMessageOnFailure = "Custom failure message",
+        };
+
+        Exception? thrownException = null;
+        try
+        {
+            await MongoDB.Insert(input, testConnection, options, default);
+        }
+        catch (Exception exception)
+        {
+            thrownException = exception;
+        }
+
+        Assert.IsNotNull(thrownException);
+        Assert.IsNull(thrownException?.InnerException);
+        Assert.AreNotEqual(options.ErrorMessageOnFailure, thrownException?.Message);
+    }
 }

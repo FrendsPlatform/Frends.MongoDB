@@ -24,7 +24,7 @@ internal static class ErrorHandler
         ArgumentNullException.ThrowIfNull(options);
 
         ThrowIfCanceled(exception, throwCanceled);
-        if (options.ThrowErrorOnFailure) ThrowBaseException(exception, options.ErrorMessageOnFailure);
+        if (options.ThrowErrorOnFailure) ThrowBaseException(exception);
 
         return ReturnResult(exception, options.ErrorMessageOnFailure);
     }
@@ -34,12 +34,9 @@ internal static class ErrorHandler
         if (throwCanceled && exception is OperationCanceledException) ThrowBaseException(exception);
     }
 
-    private static void ThrowBaseException(Exception exception, string customMessage = null)
+    private static void ThrowBaseException(Exception exception)
     {
-        if (string.IsNullOrEmpty(customMessage))
-            ExceptionDispatchInfo.Capture(exception).Throw();
-
-        throw new Exception(customMessage, exception);
+        ExceptionDispatchInfo.Capture(exception).Throw();
     }
 
     private static Result ReturnResult(Exception exception, string customMessage = null)

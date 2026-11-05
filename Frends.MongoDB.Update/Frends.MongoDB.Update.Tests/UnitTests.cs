@@ -1,5 +1,5 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Frends.MongoDB.Update.Definitions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -11,18 +11,16 @@ public class UnitTests
     /// <summary>
     /// Run command 'docker-compose up -d' in \Frends.MongoDB.Update.Tests\Files\
     /// </summary>
-
-    private static readonly Connection _connection = new()
+    private static readonly Connection MongoConnection = new()
     {
         ConnectionString = "mongodb://admin:Salakala@localhost:27017/?authSource=admin",
         Database = "testdb",
         CollectionName = "testcoll",
     };
 
-    private readonly string _doc1 = "{ 'foo':'bar', 'bar': 'foo' }";
-    private readonly string _doc2 = "{ 'foo':'bar', 'bar': 'foo' }";
-    private readonly string _doc3 = "{ 'qwe':'rty', 'asd': 'fgh' }";
-
+    private readonly string document1Json = "{ 'foo':'bar', 'bar': 'foo' }";
+    private readonly string document2Json = "{ 'foo':'bar', 'bar': 'foo' }";
+    private readonly string document3Json = "{ 'qwe':'rty', 'asd': 'fgh' }";
 
     [TestInitialize]
     public void StartUp()
@@ -39,17 +37,17 @@ public class UnitTests
     [TestMethod]
     public async Task Test_Update_NotFound()
     {
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.Filter,
             UpdateOptions = Definitions.UpdateOptions.UpdateOne,
             Filter = "{'not':'found'}",
             Filters = null,
             File = null,
-            UpdateString = "{$set: {foo:'update'}}"
+            UpdateString = "{$set: {foo:'update'}}",
         };
 
-        var result = await MongoDB.Update(_input, _connection, default);
+        var result = await MongoDB.Update(input, MongoConnection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(0, result.Count);
         Assert.IsFalse(GetDocuments("update"));
@@ -58,17 +56,17 @@ public class UnitTests
     [TestMethod]
     public async Task Test_Update_Single_UpdateOne()
     {
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.Filter,
             UpdateOptions = Definitions.UpdateOptions.UpdateOne,
             Filter = "{'foo':'bar'}",
             Filters = null,
             File = null,
-            UpdateString = "{$set: {foo:'update'}}"
+            UpdateString = "{$set: {foo:'update'}}",
         };
 
-        var result = await MongoDB.Update(_input, _connection, default);
+        var result = await MongoDB.Update(input, MongoConnection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.Count);
         Assert.IsTrue(GetDocuments("update"));
@@ -77,17 +75,17 @@ public class UnitTests
     [TestMethod]
     public async Task Test_Update_Single_UpdateMany()
     {
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.Filter,
             UpdateOptions = Definitions.UpdateOptions.UpdateMany,
             Filter = "{'foo':'bar'}",
             Filters = null,
             File = null,
-            UpdateString = "{$set: {foo:'update'}}"
+            UpdateString = "{$set: {foo:'update'}}",
         };
 
-        var result = await MongoDB.Update(_input, _connection, default);
+        var result = await MongoDB.Update(input, MongoConnection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(2, result.Count);
         Assert.IsTrue(GetDocuments("update"));
@@ -99,17 +97,17 @@ public class UnitTests
         var doc1 = new DocumentValues() { Value = "{'foo':'bar'}" };
         var doc2 = new DocumentValues() { Value = "{'qwe':'rty'}" };
 
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.Filters,
             UpdateOptions = Definitions.UpdateOptions.UpdateOne,
             Filter = null,
             Filters = new[] { doc1, doc2 },
             File = null,
-            UpdateString = "{$set: {foo:'update'}}"
+            UpdateString = "{$set: {foo:'update'}}",
         };
 
-        var result = await MongoDB.Update(_input, _connection, default);
+        var result = await MongoDB.Update(input, MongoConnection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(2, result.Count);
         Assert.IsTrue(GetDocuments("update"));
@@ -121,17 +119,17 @@ public class UnitTests
         var doc1 = new DocumentValues() { Value = "{'foo':'bar'}" };
         var doc2 = new DocumentValues() { Value = "{'qwe':'rty'}" };
 
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.Filters,
             UpdateOptions = Definitions.UpdateOptions.UpdateMany,
             Filter = null,
             Filters = new[] { doc1, doc2 },
             File = null,
-            UpdateString = "{$set: {foo:'update'}}"
+            UpdateString = "{$set: {foo:'update'}}",
         };
 
-        var result = await MongoDB.Update(_input, _connection, default);
+        var result = await MongoDB.Update(input, MongoConnection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(3, result.Count);
         Assert.IsTrue(GetDocuments("update"));
@@ -140,17 +138,17 @@ public class UnitTests
     [TestMethod]
     public async Task Test_Update_File_UpdateOne()
     {
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.File,
             UpdateOptions = Definitions.UpdateOptions.UpdateOne,
             Filter = null,
             Filters = null,
             File = "..//..//..//Files//testdata.json",
-            UpdateString = "{$set: {foo:'update'}}"
+            UpdateString = "{$set: {foo:'update'}}",
         };
 
-        var result = await MongoDB.Update(_input, _connection, default);
+        var result = await MongoDB.Update(input, MongoConnection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.Count);
         Assert.IsTrue(GetDocuments("update"));
@@ -159,55 +157,59 @@ public class UnitTests
     [TestMethod]
     public async Task Test_Update_File_UpdateMany()
     {
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.File,
             UpdateOptions = Definitions.UpdateOptions.UpdateMany,
             Filter = null,
             Filters = null,
             File = "..//..//..//Files//testdata.json",
-            UpdateString = "{$set: {foo:'update'}}"
+            UpdateString = "{$set: {foo:'update'}}",
         };
 
-        var result = await MongoDB.Update(_input, _connection, default);
+        var result = await MongoDB.Update(input, MongoConnection, new Options(), default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(2, result.Count);
         Assert.IsTrue(GetDocuments("update"));
     }
 
     [TestMethod]
-    public void Test_InvalidConnectionString()
+    public async Task Test_InvalidConnectionString()
     {
-        var _input = new Input()
+        var input = new Input()
         {
             InputType = InputType.File,
             UpdateOptions = Definitions.UpdateOptions.UpdateMany,
             Filter = null,
             Filters = null,
             File = "..//..//..//Files//testdata.json",
-            UpdateString = "{$set: {foo:'update'}}"
+            UpdateString = "{$set: {foo:'update'}}",
         };
 
         var connection = new Connection
         {
             ConnectionString = "mongodb://admin:Incorrect@localhost:27017/?authSource=invalid",
-            CollectionName = _connection.CollectionName,
-            Database = _connection.Database,
+            CollectionName = MongoConnection.CollectionName,
+            Database = MongoConnection.Database,
         };
 
-        var ex = Assert.ThrowsExceptionAsync<Exception>(async () => await MongoDB.Update(_input, connection, default));
-        Assert.IsTrue(ex.Result.Message.StartsWith("Update error: System.Exception: UpdateOperation error: MongoDB.Driver.MongoAuthenticationException: Unable to authenticate using sasl protocol mechanism SCRAM-SHA-1."));
+        var ex = await Assert.ThrowsExceptionAsync<MongoAuthenticationException>(
+            async () => await MongoDB.Update(input, connection, new Options(), default));
+        Assert.IsTrue(ex.Message.StartsWith("Unable to authenticate using sasl protocol mechanism SCRAM-SHA-1."));
     }
 
     private void InsertTestData()
     {
         try
         {
-            var collection = GetMongoCollection(_connection.ConnectionString, _connection.Database, _connection.CollectionName);
+            var collection = GetMongoCollection(
+                MongoConnection.ConnectionString,
+                MongoConnection.Database,
+                MongoConnection.CollectionName);
 
-            var doc1 = BsonDocument.Parse(_doc1);
-            var doc2 = BsonDocument.Parse(_doc2);
-            var doc3 = BsonDocument.Parse(_doc3);
+            var doc1 = BsonDocument.Parse(document1Json);
+            var doc2 = BsonDocument.Parse(document2Json);
+            var doc3 = BsonDocument.Parse(document3Json);
 
             collection.InsertOne(doc1);
             collection.InsertOne(doc2);
@@ -218,9 +220,13 @@ public class UnitTests
             throw new Exception(ex.Message);
         }
     }
-    private static void UpdateTestData()
+
+    private void UpdateTestData()
     {
-        var collection = GetMongoCollection(_connection.ConnectionString, _connection.Database, _connection.CollectionName);
+        var collection = GetMongoCollection(
+            MongoConnection.ConnectionString,
+            MongoConnection.Database,
+            MongoConnection.CollectionName);
 
         var filter1 = "{'bar':'foo'}";
         var filter2 = "{'qwe':'rty'}";
@@ -230,23 +236,29 @@ public class UnitTests
         collection.DeleteMany(filter3);
     }
 
-    private static IMongoCollection<BsonDocument> GetMongoCollection(string connectionString, string database, string collectionName)
+    private IMongoCollection<BsonDocument> GetMongoCollection(
+        string connectionString,
+        string database,
+        string collectionName)
     {
         var dataBase = GetMongoDatabase(connectionString, database);
         var collection = dataBase.GetCollection<BsonDocument>(collectionName);
         return collection;
     }
 
-    private static IMongoDatabase GetMongoDatabase(string connectionString, string database)
+    private IMongoDatabase GetMongoDatabase(string connectionString, string database)
     {
         var mongoClient = new MongoClient(connectionString);
         var dataBase = mongoClient.GetDatabase(database);
         return dataBase;
     }
 
-    private static bool GetDocuments(string updated)
+    private bool GetDocuments(string updated)
     {
-        var collection = GetMongoCollection(_connection.ConnectionString, _connection.Database, _connection.CollectionName);
+        var collection = GetMongoCollection(
+            MongoConnection.ConnectionString,
+            MongoConnection.Database,
+            MongoConnection.CollectionName);
         var documents = collection.Find(new BsonDocument()).ToList();
         var i = documents.Any(x => x.Values.Contains(updated));
         return i;

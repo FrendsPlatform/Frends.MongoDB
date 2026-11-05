@@ -1,25 +1,25 @@
-﻿namespace Frends.MongoDB.Update.Definitions;
+namespace Frends.MongoDB.Update.Definitions;
 
 /// <summary>
-/// Task's result.
+/// Task result.
 /// </summary>
 public class Result
 {
     /// <summary>
-    /// Update complete.
+    /// Indicates whether the update completed successfully.
     /// </summary>
     /// <example>true</example>
-    public bool Success { get; private set; }
+    public bool Success { get; set; }
 
     /// <summary>
-    /// Count of updated documents.
+    /// Number of documents updated.
     /// </summary>
-    /// <example>1</example>
-    public long Count { get; private set; }
+    /// <example>3</example>
+    public long Count { get; set; }
 
-    internal Result(bool success, long count)
-    {
-        Success = success;
-        Count = count;
-    }
+    /// <summary>
+    /// Error details when the update fails.
+    /// </summary>
+    /// <example>object { string Message, Exception AdditionalInfo }</example>
+    public Error Error { get; set; }
 }

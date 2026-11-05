@@ -1,10 +1,17 @@
-﻿namespace Frends.MongoDB.Delete.Definitions;
+namespace Frends.MongoDB.Delete.Definitions;
 
 /// <summary>
 /// Task's result.
 /// </summary>
 public class Result
 {
+    internal Result(bool success, long count, Error error = null)
+    {
+        Success = success;
+        Count = count;
+        Error = error;
+    }
+
     /// <summary>
     /// Delete complete.
     /// </summary>
@@ -17,9 +24,9 @@ public class Result
     /// <example>1</example>
     public long Count { get; private set; }
 
-    internal Result(bool success, long count)
-    {
-        Success = success;
-        Count = count;
-    }
+    /// <summary>
+    /// Error that occurred during task execution.
+    /// </summary>
+    /// <example>null</example>
+    public Error Error { get; private set; }
 }

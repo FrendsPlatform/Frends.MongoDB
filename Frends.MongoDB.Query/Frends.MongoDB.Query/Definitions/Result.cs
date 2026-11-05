@@ -6,9 +6,9 @@ namespace Frends.MongoDB.Query.Definitions;
 public class Result
 {
     /// <summary>
-    /// Gets or sets a value indicating whether the query completed successfully.
+    /// Indicates if the task completed successfully.
     /// </summary>
-    /// <example>true, indicating the query completed successfully.</example>
+    /// <example>true</example>
     public bool Success { get; set; }
 
     /// <summary>
@@ -18,8 +18,8 @@ public class Result
     public List<string> Data { get; set; }
 
     /// <summary>
-    /// Gets or sets error details when the query fails.
+    /// Error that occurred during task execution.
     /// </summary>
-    /// <example>null when the query succeeds.</example>
+    /// <example>object { string Message, Exception AdditionalInfo }</example>
     public Error Error { get; set; }
 }

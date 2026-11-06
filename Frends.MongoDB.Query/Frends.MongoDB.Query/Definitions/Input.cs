@@ -1,4 +1,4 @@
-﻿namespace Frends.MongoDB.Query.Definitions;
+namespace Frends.MongoDB.Query.Definitions;
 
 /// <summary>
 /// Input parameter.

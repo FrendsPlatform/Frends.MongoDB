@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Frends.MongoDB.Query.Definitions;
 
@@ -8,21 +8,21 @@ namespace Frends.MongoDB.Query.Definitions;
 public class Connection
 {
     /// <summary>
-    /// Connection string.
+    /// Gets or sets the MongoDB connection string.
     /// </summary>
-    /// <example>mongodb://foo:bar@localhost:00000/?authSource=admin</example>
+    /// <example>mongodb://localhost:27017/?authSource=admin&amp;appName=Frends.MongoDB.Query.</example>
     [PasswordPropertyText]
     public string ConnectionString { get; set; }
 
     /// <summary>
-    /// Database.
+    /// Name of the database to connect to
     /// </summary>
-    /// <example>foo</example>
+    /// <example>analytics</example>
     public string Database { get; set; }
 
     /// <summary>
-    /// Collection name.
+    /// Name of the collection name.
     /// </summary>
-    /// <example>bar</example>
+    /// <example>customers</example>
     public string CollectionName { get; set; }
 }
